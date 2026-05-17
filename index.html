@@ -3,35 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מערכת יועצים - פריד משכנתאות</title>
+    <title>מערכת אבחון משכנתא - פריד משכנתאות</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700;800&display=swap" rel="stylesheet">
+
     <style>
-        body { font-family: 'Heebo', sans-serif; background-color: #f8fafc; }
-        .premium-bg { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); }
-        .premium-text { color: #1e3a8a; }
-        .gold-accent { color: #d97706; }
-        .gold-bg { background-color: #d97706; }
-        .pdf-text { white-space: pre-wrap; word-spacing: 0.2em; }
-        @media print { .no-print { display: none !important; } }
+        body { 
+            font-family: 'Heebo', sans-serif; 
+            background-color: #f8fafc; 
+        }
+        .premium-bg { 
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); 
+        }
+        .premium-text { 
+            color: #1e3a8a; 
+        }
+        .gold-accent { 
+            color: #d97706; 
+        }
+        .gold-bg { 
+            background-color: #d97706; 
+        }
+        
+        /* התאמות מיוחדות להדפסת PDF נקייה של עברית */
+        #report-area {
+            font-family: 'Heebo', sans-serif;
+            background: #ffffff !important;
+        }
+        
+        @media print { 
+            .no-print { display: none !important; } 
+        }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
     <div id="app-screen" class="max-w-7xl mx-auto">
-        <div class="flex justify-between items-center mb-8 bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+        
+        <div class="flex justify-between items-center mb-8 bg-white p-5 rounded-xl shadow-sm border border-gray-100 no-print">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 premium-bg rounded-full flex items-center justify-center text-white font-bold">פ.מ</div>
+                <div class="w-10 h-10 premium-bg rounded-full flex items-center justify-center text-white font-bold shadow-md">פ.מ</div>
                 <span class="font-bold text-xl premium-text">מערכת אבחון משכנתא - פריד משכנתאות</span>
             </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             
-            <div class="lg:col-span-4 bg-white p-8 rounded-2xl shadow-xl no-print border border-gray-100">
+            <div class="lg:col-span-4 bg-white p-8 rounded-2xl shadow-xl no-print border border-gray-100 h-fit">
                 <h2 class="text-2xl font-bold mb-6 premium-text flex items-center gap-2">
-                    <svg class="w-6 h-6 gold-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    <svg class="w-6 h-6 gold-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
                     נתוני אבחון לקוח
                 </h2>
                 
@@ -42,23 +67,23 @@
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">טלפון לקוח</label>
-                        <input type="tel" id="clientPhone" class="w-full border p-3 rounded-lg bg-gray-50 focus:bg-white outline-none transition" placeholder="05X-XXXXXXX">
+                        <input type="tel" id="clientPhone" class="w-full border p-3 rounded-lg bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-900 outline-none transition" placeholder="05X-XXXXXXX">
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">הכנסה חודשית נטו (₪)</label>
-                        <input type="number" id="income" class="w-full border p-3 rounded-lg bg-gray-50 outline-none transition" placeholder="0" oninput="calculate()">
+                        <input type="number" id="income" class="w-full border p-3 rounded-lg bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-900 outline-none transition" placeholder="0" oninput="calculate()">
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">התחייבויות והלוואות (₪)</label>
-                        <input type="number" id="loans" class="w-full border p-3 rounded-lg bg-gray-50 outline-none transition" placeholder="0" oninput="calculate()">
+                        <input type="number" id="loans" class="w-full border p-3 rounded-lg bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-900 outline-none transition" placeholder="0" oninput="calculate()">
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">הון עצמי קיים (₪)</label>
-                        <input type="number" id="equity" class="w-full border p-3 rounded-lg bg-gray-50 outline-none transition" placeholder="0" oninput="calculate()">
+                        <input type="number" id="equity" class="w-full border p-3 rounded-lg bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-900 outline-none transition" placeholder="0" oninput="calculate()">
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">סוג עסקה</label>
-                        <select id="type" onchange="calculate()" class="w-full border p-3 rounded-lg bg-gray-50 outline-none">
+                        <select id="type" onchange="calculate()" class="w-full border p-3 rounded-lg bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-900 outline-none">
                             <option value="first">דירה יחידה / ראשונה</option>
                             <option value="improver">משפרי דיור</option>
                             <option value="investor">דירה להשקעה</option>
@@ -67,17 +92,20 @@
                 </div>
 
                 <div class="mt-8 space-y-3">
-                    <button onclick="saveAndGeneratePDF()" class="w-full premium-bg text-white font-bold py-4 rounded-xl hover:opacity-90 transition shadow-lg text-lg">
-                        שמור והפק דוח PDF
+                    <button onclick="saveAndGeneratePDF()" id="action-btn" class="w-full premium-bg text-white font-bold py-4 rounded-xl hover:opacity-90 transition shadow-lg text-lg flex items-center justify-center gap-2">
+                        <span>שמור והפק דוח PDF</span>
                     </button>
-                    <div id="save-status" class="text-center font-bold text-green-600 hidden p-2 bg-green-50 rounded-lg mt-2">
-                        התיק נשמר בענן! קוד לקוח: <br><span id="client-code" class="text-blue-900 select-all font-mono text-xl"></span>
+                    
+                    <div id="save-status" class="text-center font-bold text-green-600 hidden p-3 bg-green-50 rounded-lg mt-2 border border-green-200">
+                        🎉 התיק נשמר בהצלחה בענן! <br>
+                        <span class="text-gray-500 text-xs font-normal">קוד מזהה לקוח:</span><br>
+                        <span id="client-code" class="text-blue-900 select-all font-mono text-lg block bg-white p-1 rounded border mt-1"></span>
                     </div>
                 </div>
             </div>
 
             <div class="lg:col-span-8 relative">
-                <div id="report-area" class="bg-white p-12 rounded-2xl shadow-2xl relative overflow-hidden" style="min-height: 297mm; box-sizing: border-box;">
+                <div id="report-area" class="bg-white p-12 rounded-2xl shadow-2xl relative overflow-hidden border border-gray-100" style="min-height: 297mm; box-sizing: border-box;">
                     
                     <div class="border-b-4 border-blue-900 pb-6 mb-8 flex justify-between items-end">
                         <div>
@@ -90,43 +118,42 @@
                     </div>
 
                     <div class="bg-gray-50 rounded-xl p-6 mb-8 border border-gray-100">
-                        <h2 class="text-xl font-bold premium-text mb-4">פרטי הלקוח והאבחון</h2>
+                        <h2 class="text-xl font-bold premium-text mb-4 border-r-4 border-blue-950 pr-2">פרטי הלקוח והאבחון</h2>
                         <div class="grid grid-cols-2 gap-6">
                             <div>
                                 <p class="text-gray-500 text-sm">שם הלקוח</p>
-                                <p class="font-bold text-lg pdf-text" id="resName">-</p>
+                                <p class="font-bold text-lg text-gray-800" id="resName">ישראל ישראלי</p>
                             </div>
                             <div>
                                 <p class="text-gray-500 text-sm">הכנסה פנויה מחושבת</p>
-                                <p class="font-bold text-lg text-gray-800" id="resDisposable">-</p>
+                                <p class="font-bold text-lg text-gray-800" id="resDisposable">₪0</p>
                             </div>
                             <div>
                                 <p class="text-gray-500 text-sm">הון עצמי זמין</p>
-                                <p class="font-bold text-lg text-gray-800" id="resEquity">-</p>
+                                <p class="font-bold text-lg text-gray-800" id="resEquity">₪0</p>
                             </div>
                             <div>
                                 <p class="text-gray-500 text-sm">מסלול העסקה</p>
-                                <p class="font-bold text-lg text-gray-800" id="resType">-</p>
+                                <p class="font-bold text-lg text-gray-800" id="resType">דירה יחידה / ראשונה</p>
                             </div>
                         </div>
                     </div>
 
                     <h2 class="text-2xl font-bold premium-text mb-6">יכולת מימון ותקציב משוער</h2>
                     <div class="grid grid-cols-2 gap-6 mb-10">
-                        <div class="border-2 border-gray-200 p-6 rounded-xl text-center bg-white shadow-sm">
+                        <div class="border-2 border-gray-100 p-6 rounded-xl text-center bg-white shadow-sm">
                             <p class="text-gray-600 font-medium mb-2">משכנתא מקסימלית משוערת</p>
                             <p class="text-4xl font-extrabold premium-text">₪<span id="resLoan">0</span></p>
                         </div>
-                        <div class="border-2 border-gray-200 p-6 rounded-xl text-center bg-white shadow-sm">
+                        <div class="border-2 border-gray-100 p-6 rounded-xl text-center bg-white shadow-sm">
                             <p class="text-gray-600 font-medium mb-2">החזר חודשי מייצג מומלץ</p>
                             <p class="text-4xl font-extrabold text-green-600">₪<span id="resRepayment">0</span></p>
                         </div>
                     </div>
 
-                    <div class="premium-bg text-white p-10 rounded-2xl text-center shadow-2xl relative overflow-hidden">
-                        <div class="absolute top-0 right-0 w-32 h-32 bg-white opacity-5 rounded-full -mr-10 -mt-10"></div>
+                    <div class="premium-bg text-white p-10 rounded-2xl text-center shadow-lg relative overflow-hidden">
                         <h3 class="text-2xl font-medium opacity-90 mb-3">תקציב רכישת נכס מקסימלי</h3>
-                        <div class="text-7xl font-extrabold gold-accent tracking-tight">₪<span id="resTotalBudget">0</span></div>
+                        <div class="text-6xl font-extrabold text-amber-500 tracking-tight">₪<span id="resTotalBudget">0</span></div>
                         <p class="mt-6 text-sm opacity-70 font-light">* הנתונים מהווים הערכה מקצועית ואינם מהווים אישור עקרוני מהבנק.</p>
                     </div>
 
@@ -138,12 +165,13 @@
                         </ul>
                     </div>
 
-                    <div class="absolute bottom-8 left-12 right-12 border-t pt-4 text-center text-gray-400 text-xs flex justify-between">
+                    <div class="absolute bottom-8 left-12 right-12 border-t border-gray-100 pt-4 text-center text-gray-400 text-xs flex justify-between">
                         <span>פריד משכנתאות © כל הזכויות שמורות</span>
                         <span>טלפון: 05X-XXXXXXX | www.freid-mortgages.co.il</span>
                     </div>
                 </div>
             </div>
+            
         </div>
     </div>
 
@@ -151,6 +179,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+        // הגדרות הפיירבייס שלך
         const firebaseConfig = {
             apiKey: "AIzaSyA3HXAMF-N-KyAat6Jq7RwR_uSVk3WqILA",
             authDomain: "frid-db.firebaseapp.com",
@@ -165,56 +194,66 @@
 
         let calculatedBudgetRaw = 0;
 
+        // פונקציית החישובים בזמן אמת
         window.calculate = () => {
-            try {
-                const name = document.getElementById('clientName').value || 'ישראל ישראלי';
-                const income = parseFloat(document.getElementById('income').value) || 0;
-                const loans = parseFloat(document.getElementById('loans').value) || 0;
-                const equity = parseFloat(document.getElementById('equity').value) || 0;
-                const typeSelect = document.getElementById('type');
-                const typeText = typeSelect.options[typeSelect.selectedIndex].text;
+            const name = document.getElementById('clientName').value || 'ישראל ישראלי';
+            const income = parseFloat(document.getElementById('income').value) || 0;
+            const loans = parseFloat(document.getElementById('loans').value) || 0;
+            const equity = parseFloat(document.getElementById('equity').value) || 0;
+            const typeSelect = document.getElementById('type');
+            const typeText = typeSelect.options[typeSelect.selectedIndex].text;
 
-                const disposable = income - loans;
-                const maxRepayment = disposable * 0.38; 
-                const estimatedLoan = maxRepayment * 175; 
-                calculatedBudgetRaw = estimatedLoan + equity;
+            const disposable = Math.max(0, income - loans);
+            const maxRepayment = disposable * 0.38; 
+            const estimatedLoan = maxRepayment * 175; 
+            calculatedBudgetRaw = estimatedLoan + equity;
 
-                document.getElementById('resName').textContent = name;
-                document.getElementById('resDisposable').textContent = '₪' + disposable.toLocaleString();
-                document.getElementById('resEquity').textContent = '₪' + equity.toLocaleString();
-                document.getElementById('resType').textContent = typeText;
-                document.getElementById('resLoan').textContent = Math.floor(estimatedLoan).toLocaleString();
-                document.getElementById('resRepayment').textContent = Math.floor(maxRepayment).toLocaleString();
-                document.getElementById('resTotalBudget').textContent = Math.floor(calculatedBudgetRaw).toLocaleString();
-            } catch (e) {
-                console.error("Calculation Error:", e);
-            }
+            // עדכון התצוגה בדוח
+            document.getElementById('resName').textContent = name;
+            document.getElementById('resDisposable').textContent = '₪' + Math.floor(disposable).toLocaleString();
+            document.getElementById('resEquity').textContent = '₪' + Math.floor(equity).toLocaleString();
+            document.getElementById('resType').textContent = typeText;
+            document.getElementById('resLoan').textContent = Math.floor(estimatedLoan).toLocaleString();
+            document.getElementById('resRepayment').textContent = Math.floor(maxRepayment).toLocaleString();
+            document.getElementById('resTotalBudget').textContent = Math.floor(calculatedBudgetRaw).toLocaleString();
         };
 
+        // פונקציית הפקת ה-PDF והשמירה לענן
         window.saveAndGeneratePDF = async () => {
             const nameVal = document.getElementById('clientName').value;
             const phoneVal = document.getElementById('clientPhone').value;
+            const btn = document.getElementById('action-btn');
 
             if(!nameVal || !phoneVal) {
-                alert("חובה למלא שם מלא וטלפון בשביל לשמור ולהפיק PDF!");
+                alert("חובה למלא שם מלא וטלפון בשביל לשמור ולהפיק דוח!");
                 return;
             }
 
+            // שינוי מצב כפתור ל"טוען"
+            btn.disabled = true;
+            btn.innerHTML = `<svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> <span>מפיק דוח ושומר בענן...</span>`;
+
             try {
-                // שלב 1: מפיקים את ה-PDF באופן מיידי בלי להמתין לענן
+                // 1. הפקת ה-PDF באופן מיידי
                 const element = document.getElementById('report-area');
                 const opt = {
-                    margin: [5, 5, 5, 5],
-                    filename: `דוח_משכנתא_${nameVal}.pdf`,
+                    margin: [10, 10, 10, 10],
+                    filename: `דוח_אבחון_${nameVal}.pdf`,
                     image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+                    html2canvas: { 
+                        scale: 2, 
+                        useCORS: true, 
+                        letterRendering: true,
+                        scrollX: 0,
+                        scrollY: 0
+                    },
                     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
                 };
                 
-                // ההורדה מתחילה כאן
-                html2pdf().set(opt).from(element).save();
+                // יצירת ה-PDF
+                await html2pdf().set(opt).from(element).save();
 
-                // שלב 2: שומרים לענן ברקע
+                // 2. שמירת הנתונים ל-Firebase Firestore
                 const clientData = {
                     name: nameVal,
                     phone: phoneVal,
@@ -227,16 +266,21 @@
 
                 const docRef = await addDoc(collection(db, "clients"), clientData);
                 
-                // מעדכנים את המסך רק אם השמירה הצליחה
+                // עדכון ממשק המשתמש בהצלחה
                 document.getElementById('client-code').innerText = docRef.id;
                 document.getElementById('save-status').classList.remove('hidden');
 
             } catch (e) {
-                console.error("Firebase Error:", e);
-                alert("ה-PDF נוצר, אך הייתה בעיה בחיבור לענן (שגיאת רשת).");
+                console.error("Error occurred:", e);
+                alert("הדוח הופק, אך חלה שגיאה בשמירה לענן. ודא שפתחת את ה-Rules כפי שהונחת בשלב 1.");
+            } finally {
+                // החזרת הכפתור למצב רגיל
+                btn.disabled = false;
+                btn.innerHTML = `שמור והפק דוח PDF`;
             }
         };
 
+        // הגדרת תאריך ראשוני וחישוב מאופס בעליית המסך
         document.getElementById('currentDate').innerText = new Date().toLocaleDateString('he-IL');
         window.calculate(); 
     </script>
