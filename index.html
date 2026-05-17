@@ -249,4 +249,18 @@
                 let errorMsg = "שגיאה לא ידועה.";
                 if (e.code === 'permission-denied') {
                     errorMsg = "אין הרשאת כתיבה. חובה לשנות את ה-Rules ב-Firebase ל- allow read, write: if true;";
+                } else if (e.message.includes('network') || e.message.includes('offline')) {
+                    errorMsg = "בעיית חיבור לאינטרנט. פיירבייס לא מצליח להתחבר לענן.";
                 }
+                alert("השמירה נכשלה!\nסיבה: " + errorMsg + "\n\nהדוח לא הודפס כדי לא לאבד את המידע.");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `שמור והפק דוח PDF`;
+            }
+        };
+
+        document.getElementById('currentDate').innerText = new Date().toLocaleDateString('he-IL');
+        window.calculate(); 
+    </script>
+</body>
+</html>
