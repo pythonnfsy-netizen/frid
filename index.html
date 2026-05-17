@@ -13,17 +13,12 @@
         .premium-text { color: #1e3a8a; }
         .gold-accent { color: #d97706; }
         .gold-bg { background-color: #d97706; }
-        
-        /* פתרון לבעיית הרווחים ב-PDF בעברית */
         .pdf-text { white-space: pre-wrap; word-spacing: 0.2em; }
-        
-        /* הסתרת כפתורים בהדפסה */
         @media print { .no-print { display: none !important; } }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
-    <!-- מסך התחברות יועץ -->
     <div id="login-screen" class="max-w-md mx-auto mt-20 bg-white p-10 rounded-2xl shadow-2xl border-t-8 border-blue-900">
         <div class="text-center mb-8">
             <h1 class="text-4xl font-extrabold premium-text">כניסת יועץ</h1>
@@ -36,7 +31,6 @@
         </div>
     </div>
 
-    <!-- מסך המערכת -->
     <div id="app-screen" class="hidden max-w-7xl mx-auto">
         <div class="flex justify-between items-center mb-8 bg-white p-5 rounded-xl shadow-sm border border-gray-100">
             <div class="flex items-center gap-3">
@@ -48,7 +42,6 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             
-            <!-- פאנל הזנת נתונים -->
             <div class="lg:col-span-4 bg-white p-8 rounded-2xl shadow-xl no-print border border-gray-100">
                 <h2 class="text-2xl font-bold mb-6 premium-text flex items-center gap-2">
                     <svg class="w-6 h-6 gold-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
@@ -90,16 +83,15 @@
                     <button onclick="saveAndGeneratePDF()" class="w-full premium-bg text-white font-bold py-4 rounded-xl hover:opacity-90 transition shadow-lg text-lg">
                         שמור והפק דוח PDF
                     </button>
-                    <div id="save-status" class="text-center font-bold text-green-600 hidden">התיק נשמר בהצלחה! קוד לקוח: <span id="client-code"></span></div>
+                    <div id="save-status" class="text-center font-bold text-green-600 hidden p-2 bg-green-50 rounded-lg mt-2">
+                        התיק נשמר בהצלחה! קוד לקוח: <br><span id="client-code" class="text-blue-900 select-all font-mono text-xl"></span>
+                    </div>
                 </div>
             </div>
 
-            <!-- תצוגת ה-PDF (הדוח) -->
             <div class="lg:col-span-8 relative">
-                <!-- עיצוב פרימיום לדוח -->
                 <div id="report-area" class="bg-white p-12 rounded-2xl shadow-2xl relative overflow-hidden" style="min-height: 297mm; box-sizing: border-box;">
                     
-                    <!-- Header -->
                     <div class="border-b-4 border-blue-900 pb-6 mb-8 flex justify-between items-end">
                         <div>
                             <h1 class="text-5xl font-extrabold premium-text tracking-tight">פריד משכנתאות</h1>
@@ -110,7 +102,6 @@
                         </div>
                     </div>
 
-                    <!-- פרטי לקוח -->
                     <div class="bg-gray-50 rounded-xl p-6 mb-8 border border-gray-100">
                         <h2 class="text-xl font-bold premium-text mb-4">פרטי הלקוח והאבחון</h2>
                         <div class="grid grid-cols-2 gap-6">
@@ -133,7 +124,6 @@
                         </div>
                     </div>
 
-                    <!-- תוצאות חישוב מרכזיות -->
                     <h2 class="text-2xl font-bold premium-text mb-6">יכולת מימון ותקציב משוער</h2>
                     <div class="grid grid-cols-2 gap-6 mb-10">
                         <div class="border-2 border-gray-200 p-6 rounded-xl text-center bg-white shadow-sm">
@@ -146,7 +136,6 @@
                         </div>
                     </div>
 
-                    <!-- השורה התחתונה מודגשת -->
                     <div class="premium-bg text-white p-10 rounded-2xl text-center shadow-2xl relative overflow-hidden">
                         <div class="absolute top-0 right-0 w-32 h-32 bg-white opacity-5 rounded-full -mr-10 -mt-10"></div>
                         <h3 class="text-2xl font-medium opacity-90 mb-3">תקציב רכישת נכס מקסימלי</h3>
@@ -154,7 +143,6 @@
                         <p class="mt-6 text-sm opacity-70 font-light">* הנתונים מהווים הערכה מקצועית ואינם מהווים אישור עקרוני מהבנק.</p>
                     </div>
 
-                    <!-- הנחיות ופוטר -->
                     <div class="mt-12 bg-blue-50 border-r-4 border-blue-900 p-6 rounded-l-xl">
                         <h4 class="font-bold premium-text text-lg mb-2">המלצות יועץ לשלבים הבאים:</h4>
                         <ul class="list-disc pr-6 space-y-2 text-gray-700 text-sm">
@@ -172,7 +160,6 @@
         </div>
     </div>
 
-    <!-- Firebase SDK (v10 Modular) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
@@ -191,6 +178,9 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        // משתנה גלובלי פנימי שיחזיק את הערכים המחושבים כדי למנוע קריסה
+        let calculatedBudgetRaw = 0;
+
         // ניהול מצב התחברות
         onAuthStateChanged(auth, (user) => {
             if (user) {
@@ -206,9 +196,13 @@
         window.login = async () => {
             const email = document.getElementById('email').value;
             const pass = document.getElementById('password').value;
-            try { await signInWithEmailAndPassword(auth, email, pass); } 
-            catch (error) { alert("שגיאה בכניסה. ודא שפתחת משתמש ב-Firebase Auth"); }
+            try { 
+                await signInWithEmailAndPassword(auth, email, pass); 
+            } catch (error) { 
+                alert("שגיאה בכניסה: " + error.message); 
+            }
         };
+        
         window.logout = () => signOut(auth);
 
         // חישוב והצגה
@@ -221,68 +215,72 @@
             const typeText = typeSelect.options[typeSelect.selectedIndex].text;
 
             const disposable = income - loans;
-            const maxRepayment = disposable * 0.38; // עד 38% החזר
-            const estimatedLoan = maxRepayment * 175; // אומדן גס
-            const totalBudget = estimatedLoan + equity;
+            const maxRepayment = disposable * 0.38; 
+            const estimatedLoan = maxRepayment * 175; 
+            calculatedBudgetRaw = estimatedLoan + equity;
 
-            // שימוש ב-textContent מונע בעיות של מחיקת רווחים בעברית
+            // עדכון ה-HTML
             document.getElementById('resName').textContent = name;
             document.getElementById('resDisposable').textContent = '₪' + disposable.toLocaleString();
             document.getElementById('resEquity').textContent = '₪' + equity.toLocaleString();
             document.getElementById('resType').textContent = typeText;
             document.getElementById('resLoan').textContent = Math.floor(estimatedLoan).toLocaleString();
             document.getElementById('resRepayment').textContent = Math.floor(maxRepayment).toLocaleString();
-            document.getElementById('resTotalBudget').textContent = Math.floor(totalBudget).toLocaleString();
+            document.getElementById('resTotalBudget').textContent = Math.floor(calculatedBudgetRaw).toLocaleString();
         };
 
         // שמירה ל-DB והפקת PDF
         window.saveAndGeneratePDF = async () => {
-            const clientData = {
-                name: document.getElementById('clientName').value,
-                phone: document.getElementById('clientPhone').value,
-                income: document.getElementById('income').value,
-                loans: document.getElementById('loans').value,
-                equity: document.getElementById('equity').value,
-                budget: document.getElementById('resTotalBudget').textContent,
-                createdAt: serverTimestamp()
-            };
+            const nameVal = document.getElementById('clientName').value;
+            const phoneVal = document.getElementById('clientPhone').value;
 
-            if(!clientData.name || !clientData.phone) {
+            if(!nameVal || !phoneVal) {
                 alert("חובה להזין שם וטלפון כדי לשמור!");
                 return;
             }
 
+            const clientData = {
+                name: nameVal,
+                phone: phoneVal,
+                income: document.getElementById('income').value || "0",
+                loans: document.getElementById('loans').value || "0",
+                equity: document.getElementById('equity').value || "0",
+                budget: Math.floor(calculatedBudgetRaw).toString(),
+                createdAt: serverTimestamp()
+            };
+
             try {
-                // שמירה ל-Firestore בטבלת clients
+                // 1. שמירה ל-Firestore
                 const docRef = await addDoc(collection(db, "clients"), clientData);
                 
-                // הצגת קוד הלקוח
+                // 2. הצגת קוד הלקוח שנוצר במסך
+                document.getElementById('client-code').innerText = docRef.id;
                 document.getElementById('save-status').classList.remove('hidden');
-                document.getElementById('client-code').innerText = docRef.id; // זה הקוד שהלקוח יקליד!
 
-                // הפקת PDF חכמה ששומרת על הרווחים
+                // 3. הפקת PDF
                 const element = document.getElementById('report-area');
                 const opt = {
-                    margin: [0, 0, 0, 0],
+                    margin: [5, 5, 5, 5],
                     filename: `דוח_משכנתא_${clientData.name}.pdf`,
-                    image: { type: 'jpeg', quality: 1 },
+                    image: { type: 'jpeg', quality: 0.98 },
                     html2canvas: { 
                         scale: 2, 
                         useCORS: true,
-                        letterRendering: true // עוזר לטקסט בעברית
+                        letterRendering: true 
                     },
                     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
                 };
-                html2pdf().set(opt).from(element).save();
+                
+                await html2pdf().set(opt).from(element).save();
 
             } catch (e) {
-                console.error("Error adding document: ", e);
-                alert("שגיאה בשמירת הנתונים.");
+                console.error("Error saving/generating:", e);
+                alert("שגיאה בתהליך השמירה: " + e.message);
             }
         };
 
         document.getElementById('currentDate').innerText = new Date().toLocaleDateString('he-IL');
-        window.calculate(); // הפעלה ראשונית
+        window.calculate(); 
     </script>
 </body>
 </html>
