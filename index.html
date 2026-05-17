@@ -19,25 +19,12 @@
 </head>
 <body class="p-4 md:p-8">
 
-    <div id="login-screen" class="max-w-md mx-auto mt-20 bg-white p-10 rounded-2xl shadow-2xl border-t-8 border-blue-900">
-        <div class="text-center mb-8">
-            <h1 class="text-4xl font-extrabold premium-text">כניסת יועץ</h1>
-            <p class="text-gray-500 mt-2">פריד משכנתאות - מערכת ניהול</p>
-        </div>
-        <div class="space-y-5">
-            <input type="email" id="email" placeholder="אימייל" class="w-full border-b-2 border-gray-300 p-3 focus:outline-none focus:border-blue-900 transition text-lg">
-            <input type="password" id="password" placeholder="סיסמה" class="w-full border-b-2 border-gray-300 p-3 focus:outline-none focus:border-blue-900 transition text-lg">
-            <button onclick="login()" class="w-full premium-bg text-white p-4 rounded-xl font-bold text-lg hover:opacity-90 shadow-lg">התחבר למערכת</button>
-        </div>
-    </div>
-
-    <div id="app-screen" class="hidden max-w-7xl mx-auto">
+    <div id="app-screen" class="max-w-7xl mx-auto">
         <div class="flex justify-between items-center mb-8 bg-white p-5 rounded-xl shadow-sm border border-gray-100">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 premium-bg rounded-full flex items-center justify-center text-white font-bold">פ.מ</div>
-                <span class="font-bold text-xl premium-text">מחובר כ: <span id="user-email" class="font-normal text-gray-600"></span></span>
+                <span class="font-bold text-xl premium-text">מערכת אבחון משכנתא - פריד משכנתאות</span>
             </div>
-            <button onclick="logout()" class="text-red-500 font-medium hover:bg-red-50 px-4 py-2 rounded-lg transition">התנתק</button>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -84,7 +71,7 @@
                         שמור והפק דוח PDF
                     </button>
                     <div id="save-status" class="text-center font-bold text-green-600 hidden p-2 bg-green-50 rounded-lg mt-2">
-                        התיק נשמר בהצלחה! קוד לקוח: <br><span id="client-code" class="text-blue-900 select-all font-mono text-xl"></span>
+                        התיק נשמר בענן! קוד לקוח: <br><span id="client-code" class="text-blue-900 select-all font-mono text-xl"></span>
                     </div>
                 </div>
             </div>
@@ -162,7 +149,6 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -175,107 +161,79 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // משתנה גלובלי פנימי שיחזיק את הערכים המחושבים כדי למנוע קריסה
         let calculatedBudgetRaw = 0;
 
-        // ניהול מצב התחברות
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                document.getElementById('login-screen').classList.add('hidden');
-                document.getElementById('app-screen').classList.remove('hidden');
-                document.getElementById('user-email').innerText = user.email;
-            } else {
-                document.getElementById('login-screen').classList.remove('hidden');
-                document.getElementById('app-screen').classList.add('hidden');
-            }
-        });
-
-        window.login = async () => {
-            const email = document.getElementById('email').value;
-            const pass = document.getElementById('password').value;
-            try { 
-                await signInWithEmailAndPassword(auth, email, pass); 
-            } catch (error) { 
-                alert("שגיאה בכניסה: " + error.message); 
-            }
-        };
-        
-        window.logout = () => signOut(auth);
-
-        // חישוב והצגה
         window.calculate = () => {
-            const name = document.getElementById('clientName').value || 'ישראל ישראלי';
-            const income = parseFloat(document.getElementById('income').value) || 0;
-            const loans = parseFloat(document.getElementById('loans').value) || 0;
-            const equity = parseFloat(document.getElementById('equity').value) || 0;
-            const typeSelect = document.getElementById('type');
-            const typeText = typeSelect.options[typeSelect.selectedIndex].text;
+            try {
+                const name = document.getElementById('clientName').value || 'ישראל ישראלי';
+                const income = parseFloat(document.getElementById('income').value) || 0;
+                const loans = parseFloat(document.getElementById('loans').value) || 0;
+                const equity = parseFloat(document.getElementById('equity').value) || 0;
+                const typeSelect = document.getElementById('type');
+                const typeText = typeSelect.options[typeSelect.selectedIndex].text;
 
-            const disposable = income - loans;
-            const maxRepayment = disposable * 0.38; 
-            const estimatedLoan = maxRepayment * 175; 
-            calculatedBudgetRaw = estimatedLoan + equity;
+                const disposable = income - loans;
+                const maxRepayment = disposable * 0.38; 
+                const estimatedLoan = maxRepayment * 175; 
+                calculatedBudgetRaw = estimatedLoan + equity;
 
-            // עדכון ה-HTML
-            document.getElementById('resName').textContent = name;
-            document.getElementById('resDisposable').textContent = '₪' + disposable.toLocaleString();
-            document.getElementById('resEquity').textContent = '₪' + equity.toLocaleString();
-            document.getElementById('resType').textContent = typeText;
-            document.getElementById('resLoan').textContent = Math.floor(estimatedLoan).toLocaleString();
-            document.getElementById('resRepayment').textContent = Math.floor(maxRepayment).toLocaleString();
-            document.getElementById('resTotalBudget').textContent = Math.floor(calculatedBudgetRaw).toLocaleString();
+                document.getElementById('resName').textContent = name;
+                document.getElementById('resDisposable').textContent = '₪' + disposable.toLocaleString();
+                document.getElementById('resEquity').textContent = '₪' + equity.toLocaleString();
+                document.getElementById('resType').textContent = typeText;
+                document.getElementById('resLoan').textContent = Math.floor(estimatedLoan).toLocaleString();
+                document.getElementById('resRepayment').textContent = Math.floor(maxRepayment).toLocaleString();
+                document.getElementById('resTotalBudget').textContent = Math.floor(calculatedBudgetRaw).toLocaleString();
+            } catch (e) {
+                console.error("Calculation Error:", e);
+            }
         };
 
-        // שמירה ל-DB והפקת PDF
         window.saveAndGeneratePDF = async () => {
             const nameVal = document.getElementById('clientName').value;
             const phoneVal = document.getElementById('clientPhone').value;
 
             if(!nameVal || !phoneVal) {
-                alert("חובה להזין שם וטלפון כדי לשמור!");
+                alert("חובה למלא שם מלא וטלפון בשביל לשמור ולהפיק PDF!");
                 return;
             }
 
-            const clientData = {
-                name: nameVal,
-                phone: phoneVal,
-                income: document.getElementById('income').value || "0",
-                loans: document.getElementById('loans').value || "0",
-                equity: document.getElementById('equity').value || "0",
-                budget: Math.floor(calculatedBudgetRaw).toString(),
-                createdAt: serverTimestamp()
-            };
-
             try {
-                // 1. שמירה ל-Firestore
-                const docRef = await addDoc(collection(db, "clients"), clientData);
-                
-                // 2. הצגת קוד הלקוח שנוצר במסך
-                document.getElementById('client-code').innerText = docRef.id;
-                document.getElementById('save-status').classList.remove('hidden');
-
-                // 3. הפקת PDF
+                // שלב 1: מפיקים את ה-PDF באופן מיידי בלי להמתין לענן
                 const element = document.getElementById('report-area');
                 const opt = {
                     margin: [5, 5, 5, 5],
-                    filename: `דוח_משכנתא_${clientData.name}.pdf`,
+                    filename: `דוח_משכנתא_${nameVal}.pdf`,
                     image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { 
-                        scale: 2, 
-                        useCORS: true,
-                        letterRendering: true 
-                    },
+                    html2canvas: { scale: 2, useCORS: true, letterRendering: true },
                     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
                 };
                 
-                await html2pdf().set(opt).from(element).save();
+                // ההורדה מתחילה כאן
+                html2pdf().set(opt).from(element).save();
+
+                // שלב 2: שומרים לענן ברקע
+                const clientData = {
+                    name: nameVal,
+                    phone: phoneVal,
+                    income: document.getElementById('income').value || "0",
+                    loans: document.getElementById('loans').value || "0",
+                    equity: document.getElementById('equity').value || "0",
+                    budget: Math.floor(calculatedBudgetRaw).toString(),
+                    createdAt: serverTimestamp()
+                };
+
+                const docRef = await addDoc(collection(db, "clients"), clientData);
+                
+                // מעדכנים את המסך רק אם השמירה הצליחה
+                document.getElementById('client-code').innerText = docRef.id;
+                document.getElementById('save-status').classList.remove('hidden');
 
             } catch (e) {
-                console.error("Error saving/generating:", e);
-                alert("שגיאה בתהליך השמירה: " + e.message);
+                console.error("Firebase Error:", e);
+                alert("ה-PDF נוצר, אך הייתה בעיה בחיבור לענן (שגיאת רשת).");
             }
         };
 
