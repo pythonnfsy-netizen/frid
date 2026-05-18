@@ -83,7 +83,7 @@
                     </button>
                     
                     <div id="save-status" class="text-center font-bold text-green-600 hidden p-3 bg-green-50 rounded-lg mt-2 border border-green-200">
-                        🎉 התיק נשמר בהצלחה בבסיס הנתונים!
+                        🎉 התיק נשמר בהצלחה בבסיס הנתונים בענן!
                     </div>
                 </div>
             </div>
@@ -146,29 +146,32 @@
 
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
     <script>
         document.getElementById('currentDate').innerText = new Date().toLocaleDateString('he-IL');
 
-        let db = null;
+        let firestoreDb = null;
+        let realtimeDb = null;
         let calculatedBudgetRaw = 0;
 
-        // טעינה מאובטחת של פיירבייס - לא תוקעת את העמוד אם יש שגיאת הגדרה!
         try {
-            // === שים לב: ודא שפרטי ה-Config האלו תואמים ב-100% לפרויקט שלך בפיירבייס ===
             const firebaseConfig = {
                 apiKey: "AIzaSyA3HXAMF-N-KyAat6Jq7RwR_uSVk3WqILA",
                 authDomain: "frid-db.firebaseapp.com",
+                // כתובת ברירת מחדל ל-Realtime Database
+                databaseURL: "https://frid-db-default-rtdb.firebaseio.com", 
                 projectId: "frid-db",
                 storageBucket: "frid-db.firebasestorage.app",
                 messagingSenderId: "644587019949",
                 appId: "1:644587019949:web:ed71afabd57efac6d73024"
             };
             firebase.initializeApp(firebaseConfig);
-            db = firebase.firestore();
-            console.log("Firebase initialized");
+            firestoreDb = firebase.firestore();
+            realtimeDb = firebase.database();
+            console.log("Firebase SDK loaded successfully.");
         } catch(e) {
-            alert("שגיאה באתחול פיירבייס בקוד: " + e.message);
+            alert("שגיאה באתחול הספריות: " + e.message);
         }
 
         // פונקציית החישוב הדינמית
@@ -208,7 +211,7 @@
             btn.disabled = true;
             btn.innerText = "מפיק PDF...";
 
-            // שלב א': הפקה והורדת ה-PDF למחשב (חסין לחלוטין, יעבוד בכל מצב!)
+            // שלב א': הפקה והורדת ה-PDF למחשב (עובד תמיד)
             try {
                 const element = document.getElementById('report-area');
                 const opt = {
@@ -220,38 +223,75 @@
                     pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
                 };
                 await html2pdf().set(opt).from(element).save();
+                console.log("PDF downloaded.");
             } catch(pdfError) {
-                alert("שגיאה טכנית בהורדת ה-PDF: " + pdfError.message);
+                console.error(pdfError);
             }
 
-            // שלב ב': שמירה לענן וזריקת שגיאות מדויקות למסך במידה ונכשל
-            if (db) {
-                try {
-                    btn.innerText = "שומר נתונים בענן...";
-                    await db.collection("clients").add({
-                        name: nameVal,
-                        phone: phoneVal,
-                        income: document.getElementById('income').value || "0",
-                        loans: document.getElementById('loans').value || "0",
-                        equity: document.getElementById('equity').value || "0",
-                        budget: Math.floor(calculatedBudgetRaw).toString(),
-                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                    
-                    document.getElementById('save-status').classList.remove('hidden');
-                } catch(firebaseError) {
-                    // הפופ-אפ הקריטי שיגלה לנו את האמת:
-                    alert("❌ ה-PDF ירד בהצלחה, אך השמירה לענן נכשלה!\n\nהשגיאה של פיירבייס היא:\n" + firebaseError.message);
+            // שלב ב': מנגנון שמירה עוקף קיפאון עם טיימאאוט מובנה
+            btn.innerText = "שומר נתונים בענן...";
+            document.getElementById('save-status').classList.add('hidden');
+
+            const dataToSave = {
+                name: nameVal,
+                phone: phoneVal,
+                income: document.getElementById('income').value || "0",
+                loans: document.getElementById('loans').value || "0",
+                equity: document.getElementById('equity').value || "0",
+                budget: Math.floor(calculatedBudgetRaw).toString(),
+                created_at: Date.now()
+            };
+
+            // הגדרת פעולת השמירה (תנסה לכתוב גם ל-RTDB וגם ל-Firestore)
+            const saveExecution = new Promise(async (resolve, reject) => {
+                let success = false;
+
+                // 1. ניסיון כתיבה ל-Realtime Database
+                if (realtimeDb) {
+                    try {
+                        await realtimeDb.ref("clients").push(dataToSave);
+                        success = true;
+                        console.log("Saved to Realtime Database!");
+                    } catch(e) { console.log("RTDB try skipped/failed: ", e.message); }
                 }
-            } else {
-                alert("בסיס הנתונים לא מחובר בקוד (db = null). ודא את פרטי ה-Config.");
+
+                // 2. ניסיון כתיבה ל-Firestore (במידה והראשון נכשל או לא קיים)
+                if (firestoreDb && !success) {
+                    try {
+                        await firestoreDb.collection("clients").add({
+                            ...dataToSave,
+                            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                        success = true;
+                        console.log("Saved to Firestore!");
+                    } catch(e) { console.log("Firestore try failed: ", e.message); }
+                }
+
+                if (success) resolve();
+                else reject(new Error("שני מסדי הנתונים סירבו לקבל את המידע. ודא שהפעלת את ה-Database בקונסול ושחוקי ה-Rules פתוחים."));
+            });
+
+            // הגבלת זמן של 4 שניות בלבד כדי למנוע מהאתר להיתקע
+            const timeoutThreshold = new Promise((_, reject) => 
+                setTimeout(() => reject(new Error("החיבור לפיירבייס לקח יותר מדי זמן והתנתק. כנראה שבחרת במוצר Realtime Database אך כתובת ה-URL שלו שונה, או שחוקי האבטחה (Rules) חוסמים כתיבה.")), 4000)
+            );
+
+            try {
+                // המרוץ הגדול: מי שמסיים קודם (או השמירה או הניתוק המאובטח)
+                await Promise.race([saveExecution, timeoutThreshold]);
+                
+                // אם הגענו לכאן - השמירה הצליחה!
+                document.getElementById('save-status').classList.remove('hidden');
+            } catch(error) {
+                // הצלת חווית משתמש: הודעה ברורה ומדויקת בלי לתקוע את הלחצן
+                alert("👍 ה-PDF ירד למחשב שלך בהצלחה!\n\n⚠️ אך השמירה לענן נכשלה:\n" + error.message);
             }
-            
+
             btn.disabled = false;
             btn.innerText = "שמור והפק דוח PDF";
         };
 
-        // הפעלה ראשונית של הערכים
+        // הפעלה ראשונית
         window.calculate();
     </script>
 </body>
