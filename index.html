@@ -13,7 +13,6 @@
         body { font-family: 'Heebo', sans-serif; background-color: #f8fafc; }
         .premium-bg { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); }
         .premium-text { color: #1e3a8a; }
-        .gold-accent { color: #d97706; }
         
         #report-area {
             font-family: 'Heebo', sans-serif;
@@ -50,7 +49,7 @@
                 <div class="space-y-5">
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">שם מלא (יוצג בדוח)</label>
-                        <input type="text" id="clientName" class="w-full border p-3 rounded-lg bg-gray-50 outline-none focus:ring-2 focus:ring-blue-900 transition">
+                        <input type="text" id="clientName" class="w-full border p-3 rounded-lg bg-gray-50 outline-none focus:ring-2 focus:ring-blue-900 transition" oninput="window.calculate()">
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">טלפון לקוח</label>
@@ -58,19 +57,19 @@
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">הכנסה חודשית נטו (₪)</label>
-                        <input type="number" id="income" class="w-full border p-3 rounded-lg bg-gray-50 outline-none focus:ring-2 focus:ring-blue-900 transition" value="0">
+                        <input type="number" id="income" class="w-full border p-3 rounded-lg bg-gray-50 outline-none focus:ring-2 focus:ring-blue-900 transition" value="0" oninput="window.calculate()">
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">התחייבויות והלוואות (₪)</label>
-                        <input type="number" id="loans" class="w-full border p-3 rounded-lg bg-gray-50 outline-none focus:ring-2 focus:ring-blue-900 transition" value="0">
+                        <input type="number" id="loans" class="w-full border p-3 rounded-lg bg-gray-50 outline-none focus:ring-2 focus:ring-blue-900 transition" value="0" oninput="window.calculate()">
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">הון עצמי קיים (₪)</label>
-                        <input type="number" id="equity" class="w-full border p-3 rounded-lg bg-gray-50 outline-none focus:ring-2 focus:ring-blue-900 transition" value="0">
+                        <input type="number" id="equity" class="w-full border p-3 rounded-lg bg-gray-50 outline-none focus:ring-2 focus:ring-blue-900 transition" value="0" oninput="window.calculate()">
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">סוג עסקה</label>
-                        <select id="type" class="w-full border p-3 rounded-lg bg-gray-50 outline-none focus:ring-2 focus:ring-blue-900 transition">
+                        <select id="type" class="w-full border p-3 rounded-lg bg-gray-50 outline-none focus:ring-2 focus:ring-blue-900 transition" onchange="window.calculate()">
                             <option value="first">דירה יחידה / ראשונה</option>
                             <option value="improver">משפרי דיור</option>
                             <option value="investor">דירה להשקעה</option>
@@ -79,12 +78,12 @@
                 </div>
 
                 <div class="mt-8 space-y-3">
-                    <button type="button" id="action-btn" class="w-full premium-bg text-white font-bold py-4 rounded-xl hover:opacity-90 shadow-lg text-lg block text-center transition">
+                    <button type="button" id="action-btn" onclick="window.saveAndGeneratePDF()" class="w-full premium-bg text-white font-bold py-4 rounded-xl hover:opacity-90 shadow-lg text-lg block text-center transition">
                         שמור והפק דוח PDF
                     </button>
                     
                     <div id="save-status" class="text-center font-bold text-green-600 hidden p-3 bg-green-50 rounded-lg mt-2 border border-green-200">
-                        התיק נשמר בהצלחה בענן!
+                        🎉 התיק נשמר בהצלחה בבסיס הנתונים!
                     </div>
                 </div>
             </div>
@@ -105,10 +104,10 @@
                     <div class="avoid-page-break bg-gray-50 rounded-xl p-6 border border-gray-100 mt-6">
                         <h2 class="text-xl font-bold premium-text mb-4 border-r-4 border-blue-950 pr-2">פרטי הלקוח והאבחון</h2>
                         <div class="grid grid-cols-2 gap-6">
-                            <div><p class="text-gray-500 text-sm">שם הלקוח</p><p class="font-bold text-lg text-gray-800" id="resName">-</p></div>
+                            <div><p class="text-gray-500 text-sm">שם הלקוח</p><p class="font-bold text-lg text-gray-800" id="resName">ישראל ישראלי</p></div>
                             <div><p class="text-gray-500 text-sm">הכנסה פנויה מחושבת</p><p class="font-bold text-lg text-gray-800" id="resDisposable">₪0</p></div>
                             <div><p class="text-gray-500 text-sm">הון עצמי זמין</p><p class="font-bold text-lg text-gray-800" id="resEquity">₪0</p></div>
-                            <div><p class="text-gray-500 text-sm">מסלול העסקה</p><p class="font-bold text-lg text-gray-800" id="resType">-</p></div>
+                            <div><p class="text-gray-500 text-sm">מסלול העסקה</p><p class="font-bold text-lg text-gray-800" id="resType">דירה יחידה / ראשונה</p></div>
                         </div>
                     </div>
 
@@ -149,11 +148,14 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
     <script>
-        // אתחול תאריך
         document.getElementById('currentDate').innerText = new Date().toLocaleDateString('he-IL');
 
-        let db;
+        let db = null;
+        let calculatedBudgetRaw = 0;
+
+        // טעינה מאובטחת של פיירבייס - לא תוקעת את העמוד אם יש שגיאת הגדרה!
         try {
+            // === שים לב: ודא שפרטי ה-Config האלו תואמים ב-100% לפרויקט שלך בפיירבייס ===
             const firebaseConfig = {
                 apiKey: "AIzaSyA3HXAMF-N-KyAat6Jq7RwR_uSVk3WqILA",
                 authDomain: "frid-db.firebaseapp.com",
@@ -164,16 +166,14 @@
             };
             firebase.initializeApp(firebaseConfig);
             db = firebase.firestore();
-            console.log("Firebase Connected!");
+            console.log("Firebase initialized");
         } catch(e) {
-            console.error("Firebase init issue, but system will still work locally.", e);
+            alert("שגיאה באתחול פיירבייס בקוד: " + e.message);
         }
 
-        let calculatedBudgetRaw = 0;
-
-        // פונקציית החישוב
-        const calculate = () => {
-            const name = document.getElementById('clientName').value || '-';
+        // פונקציית החישוב הדינמית
+        window.calculate = function() {
+            const name = document.getElementById('clientName').value || 'ישראל ישראלי';
             const income = parseFloat(document.getElementById('income').value) || 0;
             const loans = parseFloat(document.getElementById('loans').value) || 0;
             const equity = parseFloat(document.getElementById('equity').value) || 0;
@@ -194,26 +194,21 @@
             document.getElementById('resTotalBudget').textContent = Math.floor(calculatedBudgetRaw).toLocaleString();
         };
 
-        // חיבור כל השדות לחישוב בזמן אמת
-        ['clientName', 'income', 'loans', 'equity', 'type'].forEach(id => {
-            document.getElementById(id).addEventListener('input', calculate);
-        });
-
-        // פונקציית הפקה ושמירה - מופרדת לחלוטין
-        document.getElementById('action-btn').addEventListener('click', async () => {
+        // פונקציית העבודה המרכזית
+        window.saveAndGeneratePDF = async function() {
             const nameVal = document.getElementById('clientName').value;
             const phoneVal = document.getElementById('clientPhone').value;
             const btn = document.getElementById('action-btn');
 
             if(!nameVal || !phoneVal) {
-                alert("חובה למלא שם וטלפון.");
+                alert("חובה למלא שם מלא ומספר טלפון.");
                 return;
             }
 
             btn.disabled = true;
-            btn.innerText = "מפיק דוח...";
+            btn.innerText = "מפיק PDF...";
 
-            // 1. קודם כל מפיקים את ה-PDF (חסין כדורים, לא קשור לאינטרנט)
+            // שלב א': הפקה והורדת ה-PDF למחשב (חסין לחלוטין, יעבוד בכל מצב!)
             try {
                 const element = document.getElementById('report-area');
                 const opt = {
@@ -225,14 +220,14 @@
                     pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
                 };
                 await html2pdf().set(opt).from(element).save();
-            } catch(e) {
-                console.error("PDF Error:", e);
-                alert("הייתה בעיה קלה ביצירת ה-PDF, אבל אנחנו שומרים את הנתונים.");
+            } catch(pdfError) {
+                alert("שגיאה טכנית בהורדת ה-PDF: " + pdfError.message);
             }
 
-            // 2. רק אז שומרים לענן
+            // שלב ב': שמירה לענן וזריקת שגיאות מדויקות למסך במידה ונכשל
             if (db) {
                 try {
+                    btn.innerText = "שומר נתונים בענן...";
                     await db.collection("clients").add({
                         name: nameVal,
                         phone: phoneVal,
@@ -242,16 +237,22 @@
                         budget: Math.floor(calculatedBudgetRaw).toString(),
                         timestamp: firebase.firestore.FieldValue.serverTimestamp()
                     });
+                    
                     document.getElementById('save-status').classList.remove('hidden');
-                } catch(e) {
-                    console.error("Save Error:", e);
-                    alert("ה-PDF ירד, אבל הנתונים לא נשמרו בענן. כנראה חסרה הרשאה בפיירבייס.");
+                } catch(firebaseError) {
+                    // הפופ-אפ הקריטי שיגלה לנו את האמת:
+                    alert("❌ ה-PDF ירד בהצלחה, אך השמירה לענן נכשלה!\n\nהשגיאה של פיירבייס היא:\n" + firebaseError.message);
                 }
+            } else {
+                alert("בסיס הנתונים לא מחובר בקוד (db = null). ודא את פרטי ה-Config.");
             }
             
             btn.disabled = false;
             btn.innerText = "שמור והפק דוח PDF";
-        });
+        };
+
+        // הפעלה ראשונית של הערכים
+        window.calculate();
     </script>
 </body>
 </html>
